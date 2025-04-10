@@ -87,7 +87,8 @@ Settings are in `.prettierrc`:
 
 ## 🔥 Screenshot
 
-> [Insert a cool screenshot of your Neovim setup here]
+![image](https://github.com/user-attachments/assets/e1ab0be0-2c8c-4541-b4f8-edab1be24774)
+
 
 ---
 

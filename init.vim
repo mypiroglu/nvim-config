@@ -27,13 +27,18 @@ Plug 'nvim-lualine/lualine.nvim'
 Plug 'kyazdani42/nvim-tree.lua'
 Plug 'nvim-tree/nvim-web-devicons'
 
-" Tamamlama ve snippet'lar
+" LSP desteği için
 Plug 'neovim/nvim-lspconfig'
+
+" Otomatik tamamlama için
 Plug 'hrsh7th/nvim-cmp'
 Plug 'hrsh7th/cmp-nvim-lsp'
 Plug 'hrsh7th/cmp-buffer'
+Plug 'hrsh7th/cmp-path'
+Plug 'hrsh7th/cmp-cmdline'
 Plug 'L3MON4D3/LuaSnip'
 Plug 'saadparwaiz1/cmp_luasnip'
+Plug 'onsails/lspkind-nvim'
 
 " React/React Native
 Plug 'leafgarland/typescript-vim'
@@ -45,10 +50,8 @@ Plug 'nvim-lua/plenary.nvim'
 
 "Git Sign
 Plug 'lewis6991/gitsigns.nvim'
-Plug 'nvim-lua/plenary.nvim'
 
 "Prettier
-Plug 'nvim-lua/plenary.nvim'
 Plug 'nvimtools/none-ls.nvim' " eski adı null-ls
 
 "Emmet
@@ -68,21 +71,14 @@ Plug 'norcalli/nvim-colorizer.lua'
 
 " TODO / FIXME yorumlarını vurgulayan eklenti
 Plug 'folke/todo-comments.nvim'
-Plug 'nvim-lua/plenary.nvim'  " bağımlılığı
 
 " Git GUI benzeri panel
 Plug 'TimUntersberger/neogit'
-Plug 'nvim-lua/plenary.nvim'  " bu zaten varsa tekrar yazmana gerek yok
-
 
 " Tema
 Plug 'morhetz/gruvbox'
 
 call plug#end()
-
-
-"Prettier
-autocmd BufWritePre *.tsx,*.ts,*.js,*.jsx,*.json,*.css,*.md :silent! !prettier --write %
 
 " -------------------------
 " Tema & UI Ayarları
@@ -99,37 +95,21 @@ require("which-key").setup()
 require('colorizer').setup()
 require("todo-comments").setup()
 require("neogit").setup()
-EOF
 
-" -------------------------
-" LSP (tsserver)
-" -------------------------
-lua << EOF
+-- LSP Ayarı
 local lspconfig = require("lspconfig")
-
-lspconfig.tsserver = nil  -- tsserver kullanımını pasifleştir
-lspconfig.ts_ls.setup({
+lspconfig.ts_ls.setup {
   on_attach = function(client, bufnr)
     client.server_capabilities.documentFormattingProvider = false
-  end
-})
+  end,
+  filetypes = {"typescript", "typescriptreact", "javascript", "javascriptreact"},
+  cmd = { "typescript-language-server", "--stdio" }
+}
 
-EOF
-
-" -------------------------
-" cmp Ayarları (Otomatik Tamamlama)
-" -------------------------
-lua << EOF
+-- Otomatik tamamlama (cmp)
 local cmp = require('cmp')
 local luasnip = require('luasnip')
 
-require('gitsigns').setup {
-  current_line_blame = true,
-  current_line_blame_opts = {
-    delay = 500,
-    virt_text_pos = 'eol',
-  },
-}
 cmp.setup({
   snippet = {
     expand = function(args)
@@ -143,14 +123,16 @@ cmp.setup({
   sources = cmp.config.sources({
     { name = 'nvim_lsp' },
     { name = 'luasnip' },
+  }, {
     { name = 'buffer' },
   }),
-formatting = {
-  format = require("lspkind").cmp_format({ maxwidth = 50 })
-}
-
+  formatting = {
+    format = require("lspkind").cmp_format({ maxwidth = 50 })
+  },
 })
- local null_ls = require("null-ls")
+
+-- null-ls (prettier)
+local null_ls = require("null-ls")
 
 null_ls.setup({
   sources = {
@@ -191,7 +173,4 @@ nnoremap <leader>gs :lua require('gitsigns').stage_hunk()<CR>
 
 " TODO yorumlarını hızlıca bulmak için
 nnoremap <leader>td :TodoTelescope<CR>
-
-" Format on save for JS, TS, JSX, TSX, JSON, CSS, Markdown
-autocmd BufWritePre *.js,*.ts,*.jsx,*.tsx,*.json,*.css,*.md silent! execute '!prettier --write ' . shellescape(@%)
 

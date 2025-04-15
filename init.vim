@@ -119,6 +119,13 @@ lua << EOF
 local cmp = require('cmp')
 local luasnip = require('luasnip')
 
+require('gitsigns').setup {
+  current_line_blame = true,
+  current_line_blame_opts = {
+    delay = 500,
+    virt_text_pos = 'eol',
+  },
+}
 cmp.setup({
   snippet = {
     expand = function(args)
@@ -148,8 +155,18 @@ nnoremap <C-n> :NvimTreeToggle<CR>
 nnoremap <leader>ff :lua require('telescope.builtin').find_files()<CR>
 nnoremap <leader>fg :lua require('telescope.builtin').live_grep()<CR>
 nnoremap <leader>fb :lua require('telescope.builtin').buffers()<CR>
+
+"Ctrl+s ile kaydetmek icin
+nnoremap <C-s> :w<CR>
+inoremap <C-s> <Esc>:w<CR>a
+
 " Neogit açmak için
 nnoremap <leader>gg :Neogit<CR>
+
+"Blame toggle
+nnoremap <leader>gb :lua require('gitsigns').toggle_current_line_blame()<CR>
+nnoremap <leader>gp :lua require('gitsigns').preview_hunk()<CR>
+nnoremap <leader>gs :lua require('gitsigns').stage_hunk()<CR>
 
 " TODO yorumlarını hızlıca bulmak için
 nnoremap <leader>td :TodoTelescope<CR>

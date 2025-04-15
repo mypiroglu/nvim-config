@@ -47,6 +47,10 @@ Plug 'nvim-lua/plenary.nvim'
 Plug 'lewis6991/gitsigns.nvim'
 Plug 'nvim-lua/plenary.nvim'
 
+"Prettier
+Plug 'nvim-lua/plenary.nvim'
+Plug 'nvimtools/none-ls.nvim' " eski adı null-ls
+
 "Emmet
 Plug 'mattn/emmet-vim'
 
@@ -145,6 +149,23 @@ formatting = {
   format = require("lspkind").cmp_format({ maxwidth = 50 })
 }
 
+})
+ local null_ls = require("null-ls")
+
+null_ls.setup({
+  sources = {
+    null_ls.builtins.formatting.prettier,
+  },
+  on_attach = function(client, bufnr)
+    if client.supports_method("textDocument/formatting") then
+      vim.api.nvim_create_autocmd("BufWritePre", {
+        buffer = bufnr,
+        callback = function()
+          vim.lsp.buf.format({ bufnr = bufnr })
+        end,
+      })
+    end
+  end,
 })
 EOF
 
